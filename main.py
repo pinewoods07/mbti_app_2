@@ -50,7 +50,7 @@ div[data-testid="stSelectbox"] > div { border: 3px solid #ff6b35 !important; bor
 """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# 피자 그리기 함수 (대폭 업그레이드)
+# 피자 그리기 함수
 # ─────────────────────────────────────────────
 def draw_pizza(mbti):
     fig, ax = plt.subplots(figsize=(6, 6))
@@ -62,150 +62,132 @@ def draw_pizza(mbti):
 
     rng = np.random.default_rng(seed=sum(ord(c) for c in mbti))
 
-    # ══ 크러스트 그라데이션 효과 (여러 겹) ══
+    # 크러스트
     for r, c in [(1.18,'#7B3F00'),(1.13,'#A0522D'),(1.08,'#C68642'),(1.02,'#D4A055')]:
-        ax.add_patch(Circle((0,0), r, color=c, zorder=1))
+        ax.add_patch(Circle((0, 0), r, color=c, zorder=1))
 
-    # 크러스트 위 점점이 (구운 느낌)
+    # 크러스트 구운 점
     for i in range(18):
-        angle = i * (2*np.pi/18) + rng.uniform(-0.1, 0.1)
+        angle = i * (2 * np.pi / 18) + rng.uniform(-0.1, 0.1)
         bx = 1.1 * np.cos(angle)
         by = 1.1 * np.sin(angle)
-        ax.add_patch(Circle((bx, by), rng.uniform(0.03,0.055),
+        ax.add_patch(Circle((bx, by), rng.uniform(0.03, 0.055),
                              color='#8B4513', zorder=2, alpha=0.6))
 
-    # ══ 토마토 소스 (여러 겹으로 자연스럽게) ══
-    ax.add_patch(Circle((0,0), 0.97, color='#B22222', zorder=3))
-    ax.add_patch(Circle((0,0), 0.93, color='#CC2222', zorder=3))
-    # 소스 얼룩
+    # 토마토 소스
+    ax.add_patch(Circle((0, 0), 0.97, color='#B22222', zorder=3))
+    ax.add_patch(Circle((0, 0), 0.93, color='#CC2222', zorder=3))
     for _ in range(8):
-        angle = rng.uniform(0, 2*np.pi)
+        angle = rng.uniform(0, 2 * np.pi)
         r = rng.uniform(0.1, 0.7)
         ax.add_patch(patches.Ellipse(
-            (r*np.cos(angle), r*np.sin(angle)),
-            rng.uniform(0.1,0.25), rng.uniform(0.08,0.18),
-            angle=rng.uniform(0,180),
+            (r * np.cos(angle), r * np.sin(angle)),
+            rng.uniform(0.1, 0.25), rng.uniform(0.08, 0.18),
+            angle=rng.uniform(0, 180),
             color='#AA1111', zorder=3, alpha=0.4))
 
-    # ══ 치즈 베이스 (불규칙한 얼룩 느낌) ══
-    ax.add_patch(Circle((0,0), 0.88, color='#F4C430', zorder=4))
-    # 치즈 기포/얼룩
+    # 치즈
+    ax.add_patch(Circle((0, 0), 0.88, color='#F4C430', zorder=4))
     for _ in range(12):
-        angle = rng.uniform(0, 2*np.pi)
+        angle = rng.uniform(0, 2 * np.pi)
         r = rng.uniform(0.05, 0.72)
         ax.add_patch(patches.Ellipse(
-            (r*np.cos(angle), r*np.sin(angle)),
-            rng.uniform(0.06,0.18), rng.uniform(0.05,0.13),
-            angle=rng.uniform(0,180),
-            color=rng.choice(['#E8B800','#FFD700','#F5D020','#EEC900']),
+            (r * np.cos(angle), r * np.sin(angle)),
+            rng.uniform(0.06, 0.18), rng.uniform(0.05, 0.13),
+            angle=rng.uniform(0, 180),
+            color=rng.choice(['#E8B800', '#FFD700', '#F5D020', '#EEC900']),
             zorder=4, alpha=0.6))
 
-    # ══ 피자 슬라이스 구분선 ══
+    # 슬라이스 선
     for i in range(8):
         angle = i * (np.pi / 4)
-        ax.plot([0, 0.97*np.cos(angle)], [0, 0.97*np.sin(angle)],
+        ax.plot([0, 0.97 * np.cos(angle)], [0, 0.97 * np.sin(angle)],
                 color='#C8A000', linewidth=0.8, zorder=5, alpha=0.5)
 
-    # ══ MBTI별 토핑 ══
-
+    # ── MBTI별 토핑 ──
     if mbti == "INTJ":
-        # 트러플 오일: 황금빛 오일 방울 + 나선형 배치
-        theta = np.linspace(0, 3*np.pi, 200)
-        r_sp = theta / (3*np.pi) * 0.75
-        ax.plot(r_sp*np.cos(theta), r_sp*np.sin(theta),
+        theta = np.linspace(0, 3 * np.pi, 200)
+        r_sp = theta / (3 * np.pi) * 0.75
+        ax.plot(r_sp * np.cos(theta), r_sp * np.sin(theta),
                 color='#8B6914', linewidth=1.5, zorder=6, alpha=0.4, linestyle='--')
         for i in range(14):
-            angle = i * (2*np.pi/14)
+            angle = i * (2 * np.pi / 14)
             r = 0.52
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            # 오일 방울 (광택 효과)
-            ax.add_patch(Circle((x,y), 0.075, color='#3D1C00', zorder=7, alpha=0.9))
-            ax.add_patch(Circle((x,y), 0.045, color='#6B3A2A', zorder=8))
-            ax.add_patch(Circle((x+0.02,y+0.02), 0.02, color='white', zorder=9, alpha=0.5))
-        ax.add_patch(Circle((0,0), 0.09, color='#3D1C00', zorder=7))
-        ax.add_patch(Circle((0.03,0.03), 0.03, color='white', zorder=8, alpha=0.5))
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            ax.add_patch(Circle((x, y), 0.075, color='#3D1C00', zorder=7, alpha=0.9))
+            ax.add_patch(Circle((x, y), 0.045, color='#6B3A2A', zorder=8))
+            ax.add_patch(Circle((x + 0.02, y + 0.02), 0.02, color='white', zorder=9, alpha=0.5))
+        ax.add_patch(Circle((0, 0), 0.09, color='#3D1C00', zorder=7))
+        ax.add_patch(Circle((0.03, 0.03), 0.03, color='white', zorder=8, alpha=0.5))
 
     elif mbti == "INTP":
-        # 파인애플: 노란 삼각형 + 갈색 테두리, 풍성하게
         for i in range(14):
-            angle = rng.uniform(0, 2*np.pi)
+            angle = rng.uniform(0, 2 * np.pi)
             r = rng.uniform(0.1, 0.72)
-            x, y = r*np.cos(angle), r*np.sin(angle)
+            x, y = r * np.cos(angle), r * np.sin(angle)
             size = rng.uniform(0.07, 0.13)
             tri = plt.Polygon(
-                [[x, y+size*1.3],
-                 [x-size, y-size*0.7],
-                 [x+size, y-size*0.7]],
-                color='#FFD700', zorder=7,
-                ec='#B8860B', linewidth=1.5)
+                [[x, y + size * 1.3],
+                 [x - size, y - size * 0.7],
+                 [x + size, y - size * 0.7]],
+                color='#FFD700', zorder=7, ec='#B8860B', linewidth=1.5)
             ax.add_patch(tri)
-            # 파인애플 격자 무늬
-            ax.plot([x, x], [y-size*0.3, y+size*0.8],
+            ax.plot([x, x], [y - size * 0.3, y + size * 0.8],
                     color='#B8860B', linewidth=0.8, zorder=8, alpha=0.7)
 
     elif mbti == "ENTJ":
-        # 살라미: 균일 배치, 테두리+광택+기름기
-        positions = [(0,0,0.0)]
-        for count, radius in [(6,0.44),(10,0.73)]:
+        positions = [(0, 0, 0.0)]
+        for count, radius in [(6, 0.44), (10, 0.73)]:
             for i in range(count):
-                angle = i*(2*np.pi/count)
-                positions.append((radius*np.cos(angle), radius*np.sin(angle), angle))
-        for (x,y,a) in positions:
-            ax.add_patch(Circle((x,y), 0.115, color='#5C0A0A', zorder=7))
-            ax.add_patch(Circle((x,y), 0.095, color='#8B0000', zorder=8))
-            ax.add_patch(Circle((x,y), 0.055, color='#A52020', zorder=9))
-            # 기름기 방울
+                angle = i * (2 * np.pi / count)
+                positions.append((radius * np.cos(angle), radius * np.sin(angle), angle))
+        for (x, y, a) in positions:
+            ax.add_patch(Circle((x, y), 0.115, color='#5C0A0A', zorder=7))
+            ax.add_patch(Circle((x, y), 0.095, color='#8B0000', zorder=8))
+            ax.add_patch(Circle((x, y), 0.055, color='#A52020', zorder=9))
             for j in range(4):
-                a2 = j*(np.pi/2)+0.3
-                ax.add_patch(Circle((x+0.06*np.cos(a2),y+0.06*np.sin(a2)),
+                a2 = j * (np.pi / 2) + 0.3
+                ax.add_patch(Circle((x + 0.06 * np.cos(a2), y + 0.06 * np.sin(a2)),
                                     0.015, color='#FF6B35', zorder=10, alpha=0.6))
-            ax.add_patch(Circle((x+0.04,y+0.04), 0.025, color='white', zorder=10, alpha=0.35))
+            ax.add_patch(Circle((x + 0.04, y + 0.04), 0.025, color='white', zorder=10, alpha=0.35))
 
     elif mbti == "ENTP":
-        # 할라피뇨: 진짜 고추 슬라이스처럼 (링 모양 + 씨앗)
         for i in range(13):
-            angle_pos = rng.uniform(0, 2*np.pi)
+            angle_pos = rng.uniform(0, 2 * np.pi)
             r = rng.uniform(0.1, 0.75)
-            x, y = r*np.cos(angle_pos), r*np.sin(angle_pos)
+            x, y = r * np.cos(angle_pos), r * np.sin(angle_pos)
             rot = rng.uniform(0, 180)
-            w, h = rng.uniform(0.16,0.22), rng.uniform(0.10,0.14)
-            # 고추 링 (외곽)
-            ax.add_patch(patches.Ellipse((x,y), w, h, angle=rot,
+            w, h = rng.uniform(0.16, 0.22), rng.uniform(0.10, 0.14)
+            ax.add_patch(patches.Ellipse((x, y), w, h, angle=rot,
                                          color='#1A6B1A', zorder=7))
-            # 고추 링 (내부 구멍)
-            ax.add_patch(patches.Ellipse((x,y), w*0.55, h*0.55, angle=rot,
+            ax.add_patch(patches.Ellipse((x, y), w * 0.55, h * 0.55, angle=rot,
                                          color='#F4C430', zorder=8))
-            # 씨앗
             for _ in range(3):
-                sx = x + rng.uniform(-0.04,0.04)
-                sy = y + rng.uniform(-0.02,0.02)
-                ax.add_patch(patches.Ellipse((sx,sy), 0.025, 0.015,
+                sx = x + rng.uniform(-0.04, 0.04)
+                sy = y + rng.uniform(-0.02, 0.02)
+                ax.add_patch(patches.Ellipse((sx, sy), 0.025, 0.015,
                                              color='#FFFFF0', zorder=9))
 
     elif mbti == "INFJ":
-        # 루꼴라: 잎맥까지 표현한 정교한 잎사귀
         for i in range(12):
-            angle = rng.uniform(0, 2*np.pi)
+            angle = rng.uniform(0, 2 * np.pi)
             r = rng.uniform(0.08, 0.73)
-            x, y = r*np.cos(angle), r*np.sin(angle)
+            x, y = r * np.cos(angle), r * np.sin(angle)
             rot = rng.uniform(0, 360)
-            color = rng.choice(['#1B4D1B','#2D6B2D','#3A8A3A','#4CAF4C'])
-            ax.add_patch(patches.Ellipse((x,y), 0.26, 0.12, angle=rot,
+            color = rng.choice(['#1B4D1B', '#2D6B2D', '#3A8A3A', '#4CAF4C'])
+            ax.add_patch(patches.Ellipse((x, y), 0.26, 0.12, angle=rot,
                                          color=color, zorder=7, alpha=0.9))
-            # 잎맥
             rad = np.radians(rot)
-            ax.plot([x-0.11*np.cos(rad), x+0.11*np.cos(rad)],
-                    [y-0.11*np.sin(rad), y+0.11*np.sin(rad)],
+            ax.plot([x - 0.11 * np.cos(rad), x + 0.11 * np.cos(rad)],
+                    [y - 0.11 * np.sin(rad), y + 0.11 * np.sin(rad)],
                     color='#0D3D0D', linewidth=0.8, zorder=8)
-            # 곁가지
             for side in [-1, 1]:
-                mx = x + side*0.05*np.cos(rad+np.pi/2)
-                my = y + side*0.05*np.sin(rad+np.pi/2)
-                ax.plot([x, mx],[y, my],
+                mx = x + side * 0.05 * np.cos(rad + np.pi / 2)
+                my = y + side * 0.05 * np.sin(rad + np.pi / 2)
+                ax.plot([x, mx], [y, my],
                         color='#0D3D0D', linewidth=0.5, zorder=8, alpha=0.7)
 
     elif mbti == "INFP":
-        # 바질: 큼직하고 윤기나는 잎 + 잎맥 풍성하게
         leaf_data = [
             (0.35, 0.38, 40), (-0.42, 0.28, 130),
             (0.08, -0.48, 70), (-0.28, -0.35, 160),
@@ -213,232 +195,206 @@ def draw_pizza(mbti):
         ]
         for (lx, ly, rot) in leaf_data:
             rad = np.radians(rot)
-            # 잎 그림자
-            ax.add_patch(patches.Ellipse((lx+0.02, ly-0.02), 0.38, 0.2,
+            ax.add_patch(patches.Ellipse((lx + 0.02, ly - 0.02), 0.38, 0.2,
                                          angle=rot, color='#1A5C1A', zorder=6, alpha=0.4))
-            # 잎 본체
             ax.add_patch(patches.Ellipse((lx, ly), 0.36, 0.19,
                                          angle=rot, color='#27AE60', zorder=7))
             ax.add_patch(patches.Ellipse((lx, ly), 0.36, 0.19,
                                          angle=rot, color='#2ECC71', zorder=7, alpha=0.4))
-            # 중심 잎맥
-            ax.plot([lx-0.16*np.cos(rad), lx+0.16*np.cos(rad)],
-                    [ly-0.16*np.sin(rad), ly+0.16*np.sin(rad)],
+            ax.plot([lx - 0.16 * np.cos(rad), lx + 0.16 * np.cos(rad)],
+                    [ly - 0.16 * np.sin(rad), ly + 0.16 * np.sin(rad)],
                     color='#1A6B3A', linewidth=1.2, zorder=8)
-            # 곁가지 잎맥
             for t in [-0.08, 0, 0.08]:
-                px = lx + t*np.cos(rad)
-                py = ly + t*np.sin(rad)
-                for side in [-1,1]:
-                    ex = px + side*0.07*np.cos(rad+np.pi/2)
-                    ey = py + side*0.07*np.sin(rad+np.pi/2)
-                    ax.plot([px,ex],[py,ey],
+                px = lx + t * np.cos(rad)
+                py = ly + t * np.sin(rad)
+                for side in [-1, 1]:
+                    ex = px + side * 0.07 * np.cos(rad + np.pi / 2)
+                    ey = py + side * 0.07 * np.sin(rad + np.pi / 2)
+                    ax.plot([px, ex], [py, ey],
                             color='#1A6B3A', linewidth=0.6, zorder=8, alpha=0.8)
 
     elif mbti == "ENFJ":
-        # 모짜렐라: 녹아내린 치즈 느낌 (불규칙 흰 얼룩 + 그을린 점)
         for i in range(10):
-            angle = i*(2*np.pi/10) + rng.uniform(-0.2,0.2)
+            angle = i * (2 * np.pi / 10) + rng.uniform(-0.2, 0.2)
             r = rng.uniform(0.18, 0.68)
-            x, y = r*np.cos(angle), r*np.sin(angle)
+            x, y = r * np.cos(angle), r * np.sin(angle)
             w = rng.uniform(0.22, 0.38)
             h = rng.uniform(0.14, 0.26)
-            rot = rng.uniform(0,180)
-            ax.add_patch(patches.Ellipse((x,y), w, h, angle=rot,
+            rot = rng.uniform(0, 180)
+            ax.add_patch(patches.Ellipse((x, y), w, h, angle=rot,
                                          color='#FFFDE7', zorder=7, alpha=0.95,
                                          ec='#F0DC82', linewidth=1.2))
-            # 그을린 점
-            for _ in range(rng.integers(2,5)):
-                bx = x + rng.uniform(-w/3, w/3)
-                by = y + rng.uniform(-h/3, h/3)
-                ax.add_patch(Circle((bx,by), rng.uniform(0.01,0.03),
+            for _ in range(rng.integers(2, 5)):
+                bx = x + rng.uniform(-w / 3, w / 3)
+                by = y + rng.uniform(-h / 3, h / 3)
+                ax.add_patch(Circle((bx, by), rng.uniform(0.01, 0.03),
                                     color='#C8A000', zorder=8, alpha=0.5))
 
     elif mbti == "ENFP":
-        # 콘: 통통한 낱알 + 광택
         for i in range(35):
-            angle = rng.uniform(0, 2*np.pi)
+            angle = rng.uniform(0, 2 * np.pi)
             r = rng.uniform(0.05, 0.78)
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            rot = rng.uniform(0,180)
-            col = rng.choice(['#FFD700','#FFC200','#FFE44D','#F5C800'])
-            ax.add_patch(patches.Ellipse((x,y), 0.11, 0.075, angle=rot,
-                                         color=col, zorder=7,
-                                         ec='#CC9900', linewidth=1))
-            ax.add_patch(patches.Ellipse((x+0.015,y+0.015), 0.04, 0.025,
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            rot = rng.uniform(0, 180)
+            col = rng.choice(['#FFD700', '#FFC200', '#FFE44D', '#F5C800'])
+            ax.add_patch(patches.Ellipse((x, y), 0.11, 0.075, angle=rot,
+                                         color=col, zorder=7, ec='#CC9900', linewidth=1))
+            ax.add_patch(patches.Ellipse((x + 0.015, y + 0.015), 0.04, 0.025,
                                          angle=rot, color='white', zorder=8, alpha=0.4))
 
     elif mbti == "ISTJ":
-        # 양파: 반투명 링, 여러 겹으로 쌓인 느낌
         for i in range(10):
-            angle = i*(2*np.pi/10)
+            angle = i * (2 * np.pi / 10)
             r = rng.uniform(0.18, 0.68)
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            rot = rng.uniform(0,180)
-            # 겹겹이
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            rot = rng.uniform(0, 180)
             for scale, alpha, col in [
                 (1.0, 0.8, '#9B59B6'),
                 (0.75, 0.6, '#C39BD3'),
                 (0.45, 0.9, '#E8DAEF')]:
-                ax.add_patch(patches.Ellipse((x,y), 0.24*scale, 0.13*scale,
+                ax.add_patch(patches.Ellipse((x, y), 0.24 * scale, 0.13 * scale,
                                              angle=rot, color=col,
                                              zorder=7, alpha=alpha,
                                              ec='#7D3C98', linewidth=0.8))
 
     elif mbti == "ISFJ":
-        # 버섯: 갓+줄기 입체감 있게
         mushroom_pos = [
-            (0.0,0.55),(−0.48,0.22),(0.48,0.22),
-            (0.0,−0.48),(−0.32,−0.58),(0.38,−0.48),(−0.55,−0.2)
+            (0.0, 0.55), (-0.48, 0.22), (0.48, 0.22),
+            (0.0, -0.48), (-0.32, -0.58), (0.38, -0.48), (-0.55, -0.2)
         ]
-        for (mx,my) in mushroom_pos:
-            # 갓 그림자
-            ax.add_patch(patches.Ellipse((mx+0.02,my+0.02), 0.28, 0.16,
+        for (mx, my) in mushroom_pos:
+            ax.add_patch(patches.Ellipse((mx + 0.02, my + 0.02), 0.28, 0.16,
                                          color='#5C2E00', zorder=6, alpha=0.35))
-            # 갓
-            ax.add_patch(patches.Ellipse((mx,my+0.06), 0.27, 0.15,
+            ax.add_patch(patches.Ellipse((mx, my + 0.06), 0.27, 0.15,
                                          color='#8B4513', zorder=7))
-            ax.add_patch(patches.Ellipse((mx,my+0.06), 0.27, 0.15,
+            ax.add_patch(patches.Ellipse((mx, my + 0.06), 0.27, 0.15,
                                          color='#A0522D', zorder=7, alpha=0.5))
-            # 갓 하이라이트
-            ax.add_patch(patches.Ellipse((mx-0.05,my+0.09), 0.1, 0.05,
+            ax.add_patch(patches.Ellipse((mx - 0.05, my + 0.09), 0.1, 0.05,
                                          color='white', zorder=8, alpha=0.25))
-            # 줄기
             stem = plt.Polygon(
-                [[mx-0.045,my+0.02],[mx+0.045,my+0.02],
-                 [mx+0.035,my-0.1],[mx-0.035,my-0.1]],
+                [[mx - 0.045, my + 0.02], [mx + 0.045, my + 0.02],
+                 [mx + 0.035, my - 0.1], [mx - 0.035, my - 0.1]],
                 color='#D2B48C', zorder=7)
             ax.add_patch(stem)
-            # 주름선
             for j in range(3):
-                lx = mx - 0.06 + j*0.06
-                ax.plot([lx,lx],[my-0.09,my+0.02],
+                lx = mx - 0.06 + j * 0.06
+                ax.plot([lx, lx], [my - 0.09, my + 0.02],
                         color='#C4A882', linewidth=0.5, zorder=8, alpha=0.6)
 
     elif mbti == "ESTJ":
-        # 페퍼로니: 완벽 균일 배치 + 입체감
-        positions_e = [(0,0)]
-        for count, radius in [(6,0.43),(11,0.72)]:
+        positions_e = [(0, 0)]
+        for count, radius in [(6, 0.43), (11, 0.72)]:
             for i in range(count):
-                angle = i*(2*np.pi/count)
-                positions_e.append((radius*np.cos(angle), radius*np.sin(angle)))
-        for (x,y) in positions_e:
-            ax.add_patch(Circle((x,y), 0.125, color='#6B0000', zorder=7))
-            ax.add_patch(Circle((x,y), 0.105, color='#990000', zorder=8))
-            ax.add_patch(Circle((x,y), 0.075, color='#CC2200', zorder=9))
-            ax.add_patch(Circle((x,y), 0.04, color='#FF4422', zorder=10))
-            ax.add_patch(Circle((x+0.04,y+0.04), 0.025,
+                angle = i * (2 * np.pi / count)
+                positions_e.append((radius * np.cos(angle), radius * np.sin(angle)))
+        for (x, y) in positions_e:
+            ax.add_patch(Circle((x, y), 0.125, color='#6B0000', zorder=7))
+            ax.add_patch(Circle((x, y), 0.105, color='#990000', zorder=8))
+            ax.add_patch(Circle((x, y), 0.075, color='#CC2200', zorder=9))
+            ax.add_patch(Circle((x, y), 0.04, color='#FF4422', zorder=10))
+            ax.add_patch(Circle((x + 0.04, y + 0.04), 0.025,
                                  color='white', zorder=11, alpha=0.3))
-            # 기름기 방울
             for j in range(3):
-                a2 = j*(2*np.pi/3)
-                ax.add_patch(Circle((x+0.085*np.cos(a2),y+0.085*np.sin(a2)),
+                a2 = j * (2 * np.pi / 3)
+                ax.add_patch(Circle((x + 0.085 * np.cos(a2), y + 0.085 * np.sin(a2)),
                                     0.012, color='#FF8C00', zorder=10, alpha=0.5))
 
     elif mbti == "ESFJ":
-        # 고구마 무스: 소용돌이 + 풍성한 크림 덩어리
-        theta = np.linspace(0, 5*np.pi, 500)
-        r_sp = theta/(5*np.pi)*0.78
-        xs, ys = r_sp*np.cos(theta), r_sp*np.sin(theta)
-        for lw, col, alpha in [(10,'#CC6600',0.6),(7,'#FF8C00',0.7),(4,'#FFB347',0.8),(2,'#FFD580',0.9)]:
-            ax.plot(xs, ys, color=col, linewidth=lw, zorder=6+lw//3, alpha=alpha,
-                    solid_capstyle='round')
-        # 크림 방울
+        theta = np.linspace(0, 5 * np.pi, 500)
+        r_sp = theta / (5 * np.pi) * 0.78
+        xs, ys = r_sp * np.cos(theta), r_sp * np.sin(theta)
+        for lw, col, alpha in [
+            (10, '#CC6600', 0.6), (7, '#FF8C00', 0.7),
+            (4, '#FFB347', 0.8), (2, '#FFD580', 0.9)]:
+            ax.plot(xs, ys, color=col, linewidth=lw,
+                    zorder=6 + lw // 3, alpha=alpha, solid_capstyle='round')
         for i in range(8):
-            angle = i*(2*np.pi/8)
+            angle = i * (2 * np.pi / 8)
             r = 0.45
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            ax.add_patch(patches.Ellipse((x,y), 0.18, 0.13,
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            ax.add_patch(patches.Ellipse((x, y), 0.18, 0.13,
                                          color='#FFE4B5', zorder=10, alpha=0.85,
                                          ec='#DDA050', linewidth=1))
 
     elif mbti == "ISTP":
-        # 올리브: 단면 + 속 빨간 피망
         olive_pos = [
-            (0.1,0.52),(−0.52,0.12),(0.47,−0.22),
-            (−0.18,−0.52),(0.57,0.35),(−0.42,−0.47),(0.0,−0.2)
+            (0.1, 0.52), (-0.52, 0.12), (0.47, -0.22),
+            (-0.18, -0.52), (0.57, 0.35), (-0.42, -0.47), (0.0, -0.2)
         ]
-        colors = ['#2C2C2C','#3B7A3B','#2C2C2C','#3B7A3B','#2C2C2C','#3B7A3B','#2C2C2C']
-        for (ox,oy),col in zip(olive_pos,colors):
-            ax.add_patch(Circle((ox,oy), 0.115, color=col, zorder=7))
-            ax.add_patch(Circle((ox,oy), 0.085, color='#4A4A4A' if col=='#2C2C2C' else '#4A9A4A', zorder=8))
-            # 피망 속
-            ax.add_patch(Circle((ox,oy), 0.048, color='#CC2200', zorder=9))
-            ax.add_patch(Circle((ox,oy), 0.025, color='#FF4422', zorder=10))
-            ax.add_patch(Circle((ox+0.015,oy+0.015), 0.012, color='white', zorder=11, alpha=0.4))
+        colors = ['#2C2C2C', '#3B7A3B', '#2C2C2C', '#3B7A3B', '#2C2C2C', '#3B7A3B', '#2C2C2C']
+        for (ox, oy), col in zip(olive_pos, colors):
+            ax.add_patch(Circle((ox, oy), 0.115, color=col, zorder=7))
+            ax.add_patch(Circle((ox, oy), 0.085,
+                                 color='#4A4A4A' if col == '#2C2C2C' else '#4A9A4A', zorder=8))
+            ax.add_patch(Circle((ox, oy), 0.048, color='#CC2200', zorder=9))
+            ax.add_patch(Circle((ox, oy), 0.025, color='#FF4422', zorder=10))
+            ax.add_patch(Circle((ox + 0.015, oy + 0.015), 0.012,
+                                 color='white', zorder=11, alpha=0.4))
 
     elif mbti == "ISFP":
-        # 선드라이 토마토: 쭈글쭈글한 질감 표현
         for i in range(9):
-            angle = i*(2*np.pi/9)+0.4
+            angle = i * (2 * np.pi / 9) + 0.4
             r = rng.uniform(0.18, 0.68)
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            rot = rng.uniform(0,180)
-            ax.add_patch(patches.Ellipse((x,y), 0.24, 0.15, angle=rot,
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            rot = rng.uniform(0, 180)
+            ax.add_patch(patches.Ellipse((x, y), 0.24, 0.15, angle=rot,
                                          color='#7B0000', zorder=7))
-            ax.add_patch(patches.Ellipse((x,y), 0.2, 0.12, angle=rot,
+            ax.add_patch(patches.Ellipse((x, y), 0.2, 0.12, angle=rot,
                                          color='#A00000', zorder=8))
-            # 주름
             for j in range(4):
-                rad = np.radians(rot + j*40)
-                ax.plot([x+0.03*np.cos(rad), x+0.09*np.cos(rad)],
-                        [y+0.03*np.sin(rad), y+0.09*np.sin(rad)],
+                rad = np.radians(rot + j * 40)
+                ax.plot([x + 0.03 * np.cos(rad), x + 0.09 * np.cos(rad)],
+                        [y + 0.03 * np.sin(rad), y + 0.09 * np.sin(rad)],
                         color='#600000', linewidth=0.8, zorder=9, alpha=0.7)
-            ax.add_patch(Circle((x-0.05,y+0.03), 0.018,
+            ax.add_patch(Circle((x - 0.05, y + 0.03), 0.018,
                                  color='#FF6644', zorder=9, alpha=0.5))
 
     elif mbti == "ESTP":
-        # 베이컨: 구불구불 + 지방층
         for i in range(6):
-            y_base = -0.72 + i*0.27
+            y_base = -0.72 + i * 0.27
             x_wave = np.linspace(-0.78, 0.78, 200)
-            wave = y_base + 0.06*np.sin(x_wave*9 + i*1.1)
-            # 가장자리 클리핑 (원 안에만)
-            mask = x_wave**2 + wave**2 < 0.82**2
+            wave = y_base + 0.06 * np.sin(x_wave * 9 + i * 1.1)
+            mask = x_wave ** 2 + wave ** 2 < 0.82 ** 2
             xm, ym = x_wave[mask], wave[mask]
-            if len(xm) == 0: continue
-            # 지방 (흰색)
-            ax.plot(xm, ym+0.025, color='#F5E6D3', linewidth=9,
+            if len(xm) == 0:
+                continue
+            ax.plot(xm, ym + 0.025, color='#F5E6D3', linewidth=9,
                     zorder=6, alpha=0.9, solid_capstyle='round')
-            # 살코기 (갈색)
             ax.plot(xm, ym, color='#8B1A1A', linewidth=7,
                     zorder=7, alpha=0.9, solid_capstyle='round')
-            # 구운 느낌
             ax.plot(xm, ym, color='#A0522D', linewidth=4,
                     zorder=8, alpha=0.7, solid_capstyle='round')
-            ax.plot(xm, ym+0.01, color='#CD853F', linewidth=2,
+            ax.plot(xm, ym + 0.01, color='#CD853F', linewidth=2,
                     zorder=9, alpha=0.5, solid_capstyle='round')
 
     elif mbti == "ESFP":
-        # 케첩: 지그재그 드리즐 + 방울 + 광택
-        for k, (offset, phase) in enumerate([(-0.38,0),(-0.13,1.2),(0.13,0.4),(0.38,2.1)]):
+        for k, (offset, phase) in enumerate([(-0.38, 0), (-0.13, 1.2), (0.13, 0.4), (0.38, 2.1)]):
             x_d = np.linspace(-0.76, 0.76, 300)
-            y_d = offset + 0.16*np.sin(x_d*11 + phase)
-            mask = x_d**2 + y_d**2 < 0.82**2
+            y_d = offset + 0.16 * np.sin(x_d * 11 + phase)
+            mask = x_d ** 2 + y_d ** 2 < 0.82 ** 2
             xm, ym = x_d[mask], y_d[mask]
-            if len(xm)==0: continue
-            ax.plot(xm, ym, color='#AA0000', linewidth=5, zorder=6,
-                    alpha=0.85, solid_capstyle='round')
-            ax.plot(xm, ym, color='#EE0000', linewidth=2.5, zorder=7,
-                    alpha=0.7, solid_capstyle='round')
-            ax.plot(xm, ym+0.008, color='#FF6666', linewidth=1, zorder=8,
-                    alpha=0.4, solid_capstyle='round')
+            if len(xm) == 0:
+                continue
+            ax.plot(xm, ym, color='#AA0000', linewidth=5,
+                    zorder=6, alpha=0.85, solid_capstyle='round')
+            ax.plot(xm, ym, color='#EE0000', linewidth=2.5,
+                    zorder=7, alpha=0.7, solid_capstyle='round')
+            ax.plot(xm, ym + 0.008, color='#FF6666', linewidth=1,
+                    zorder=8, alpha=0.4, solid_capstyle='round')
         for i in range(8):
-            angle = rng.uniform(0, 2*np.pi)
+            angle = rng.uniform(0, 2 * np.pi)
             r = rng.uniform(0.08, 0.65)
-            x, y = r*np.cos(angle), r*np.sin(angle)
-            ax.add_patch(Circle((x,y), rng.uniform(0.03,0.065),
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            ax.add_patch(Circle((x, y), rng.uniform(0.03, 0.065),
                                  color='#CC0000', zorder=9, alpha=0.8))
-            ax.add_patch(Circle((x+0.01,y+0.01), rng.uniform(0.01,0.02),
+            ax.add_patch(Circle((x + 0.01, y + 0.01), rng.uniform(0.01, 0.02),
                                  color='white', zorder=10, alpha=0.4))
 
-    # ══ 크러스트 테두리 마무리 ══
-    ax.add_patch(Circle((0,0), 1.18, fill=False,
-                         ec='#5C2E00', linewidth=3, zorder=11))
-    ax.add_patch(Circle((0,0), 0.97, fill=False,
-                         ec='#8B6914', linewidth=1, zorder=11, alpha=0.4))
+    # 크러스트 테두리 마무리
+    ax.add_patch(Circle((0, 0), 1.18, fill=False, ec='#5C2E00', linewidth=3, zorder=11))
+    ax.add_patch(Circle((0, 0), 0.97, fill=False, ec='#8B6914', linewidth=1, zorder=11, alpha=0.4))
 
-    # ══ MBTI 라벨 ══
+    # MBTI 라벨
     ax.text(0, -1.33, mbti, fontsize=16, ha='center', va='center',
             color='#c0392b', fontweight='bold',
             bbox=dict(boxstyle='round,pad=0.4', facecolor='#fff9f5',
@@ -449,7 +405,7 @@ def draw_pizza(mbti):
 
 
 # ─────────────────────────────────────────────
-# 데이터 (궁합 토핑명 수정 완료)
+# 데이터
 # ─────────────────────────────────────────────
 PIZZA_DATA = {
     "INTJ": {
@@ -583,10 +539,10 @@ PIZZA_DATA = {
 }
 
 MBTI_LIST = [
-    "INTJ","INTP","ENTJ","ENTP",
-    "INFJ","INFP","ENFJ","ENFP",
-    "ISTJ","ISFJ","ESTJ","ESFJ",
-    "ISTP","ISFP","ESTP","ESFP",
+    "INTJ", "INTP", "ENTJ", "ENTP",
+    "INFJ", "INFP", "ENFJ", "ENFP",
+    "ISTJ", "ISFJ", "ESTJ", "ESFJ",
+    "ISTP", "ISFP", "ESTP", "ESFP",
 ]
 
 # ─────────────────────────────────────────────
