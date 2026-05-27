@@ -1,4 +1,8 @@
 import streamlit as st
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.patches import Circle, FancyBboxPatch, Wedge
+import numpy as np
 
 # ─────────────────────────────────────────────
 # 페이지 설정
@@ -84,55 +88,6 @@ html, body, [class*="css"] {
     font-size: 1.1rem;
 }
 
-.compat-row {
-    display: flex;
-    gap: 15px;
-    margin: 20px 0;
-}
-
-.compat-card {
-    flex: 1;
-    border-radius: 15px;
-    padding: 18px;
-    text-align: center;
-}
-
-.good-card {
-    background: #e8f5e9;
-    border: 3px solid #4caf50;
-}
-
-.bad-card {
-    background: #fde8e8;
-    border: 3px solid #e53935;
-}
-
-.compat-card .compat-title {
-    font-weight: 700;
-    font-size: 1rem;
-    margin-bottom: 8px;
-}
-
-.compat-card .compat-mbti {
-    font-family: 'Black Han Sans', sans-serif;
-    font-size: 1.4rem;
-}
-
-.compat-card .compat-desc {
-    font-size: 0.8rem;
-    margin-top: 6px;
-    opacity: 0.8;
-}
-
-.footer {
-    text-align: center;
-    color: #aaa;
-    font-size: 0.8rem;
-    margin-top: 40px;
-    padding: 20px;
-    border-top: 2px dashed #ffcba4;
-}
-
 .verdict-box {
     background: linear-gradient(135deg, #c0392b, #e74c3c);
     color: white;
@@ -152,12 +107,304 @@ html, body, [class*="css"] {
     margin-bottom: 5px;
 }
 
+.footer {
+    text-align: center;
+    color: #aaa;
+    font-size: 0.8rem;
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 2px dashed #ffcba4;
+}
+
 div[data-testid="stSelectbox"] > div {
     border: 3px solid #ff6b35 !important;
     border-radius: 10px !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+# 피자 그리기 함수
+# ─────────────────────────────────────────────
+def draw_pizza(mbti):
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    ax.set_xlim(-1.3, 1.3)
+    ax.set_ylim(-1.3, 1.3)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    fig.patch.set_facecolor('#fff9f5')
+
+    # ── 공통: 도우 (크러스트) ──
+    crust = Circle((0, 0), 1.1, color='#c8832a', zorder=1)
+    ax.add_patch(crust)
+
+    # ── 공통: 소스 ──
+    sauce = Circle((0, 0), 0.95, color='#c0392b', zorder=2)
+    ax.add_patch(sauce)
+
+    # ── 공통: 치즈 베이스 ──
+    cheese = Circle((0, 0), 0.88, color='#f5c842', zorder=3)
+    ax.add_patch(cheese)
+
+    # ── MBTI별 토핑 그리기 ──
+    rng = np.random.default_rng(seed=sum(ord(c) for c in mbti))
+
+    if mbti == "INTJ":
+        # 트러플 오일: 우아한 나선형 갈색 점들
+        for i in range(12):
+            angle = i * (2 * np.pi / 12)
+            r = 0.55
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            dot = Circle((x, y), 0.07, color='#4a2c0a', zorder=5, alpha=0.85)
+            ax.add_patch(dot)
+        center_dot = Circle((0, 0), 0.09, color='#4a2c0a', zorder=5)
+        ax.add_patch(center_dot)
+        ax.text(0, 0, '✦', fontsize=14, ha='center', va='center',
+                color='#f5c842', zorder=6, fontweight='bold')
+
+    elif mbti == "INTP":
+        # 파인애플: 노란 삼각형 조각들
+        for i in range(8):
+            angle = i * (2 * np.pi / 8) + 0.2
+            r = rng.uniform(0.25, 0.65)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            triangle = plt.Polygon(
+                [[x, y+0.1], [x-0.09, y-0.07], [x+0.09, y-0.07]],
+                color='#FFD700', zorder=5, ec='#FFA500', linewidth=1.5
+            )
+            ax.add_patch(triangle)
+
+    elif mbti == "ENTJ":
+        # 살라미: 붉은 원형 슬라이스, 균일 배치
+        positions = []
+        for ring, count, radius in [(1, 1, 0.0), (2, 6, 0.45), (3, 10, 0.72)]:
+            for i in range(count):
+                angle = i * (2 * np.pi / count)
+                x = radius * np.cos(angle)
+                y = radius * np.sin(angle)
+                positions.append((x, y))
+        for (x, y) in positions:
+            salami = Circle((x, y), 0.11, color='#8B0000', zorder=5, alpha=0.9)
+            ax.add_patch(salami)
+            inner = Circle((x, y), 0.05, color='#c0392b', zorder=6)
+            ax.add_patch(inner)
+
+    elif mbti == "ENTP":
+        # 할라피뇨: 초록 타원형 슬라이스
+        for i in range(10):
+            angle = rng.uniform(0, 2 * np.pi)
+            r = rng.uniform(0.15, 0.72)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            ellipse = patches.Ellipse(
+                (x, y), 0.18, 0.08,
+                angle=np.degrees(angle),
+                color='#228B22', zorder=5, alpha=0.9
+            )
+            ax.add_patch(ellipse)
+            seed_ellipse = patches.Ellipse(
+                (x, y), 0.06, 0.03,
+                angle=np.degrees(angle),
+                color='#90EE90', zorder=6
+            )
+            ax.add_patch(seed_ellipse)
+
+    elif mbti == "INFJ":
+        # 루꼴라: 잎사귀 모양 (작은 녹색 타원 여러 개)
+        for i in range(14):
+            angle = rng.uniform(0, 2 * np.pi)
+            r = rng.uniform(0.1, 0.75)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            leaf = patches.Ellipse(
+                (x, y), 0.22, 0.1,
+                angle=rng.uniform(0, 180),
+                color=rng.choice(['#2d5a1b', '#4a7c2f', '#6aab3f']),
+                zorder=5, alpha=0.85
+            )
+            ax.add_patch(leaf)
+
+    elif mbti == "INFP":
+        # 바질: 큰 초록 잎 3~4장
+        leaf_positions = [(0.3, 0.35), (-0.4, 0.25), (0.1, -0.45), (-0.25, -0.3)]
+        for (lx, ly) in leaf_positions:
+            leaf = patches.Ellipse(
+                (lx, ly), 0.35, 0.18,
+                angle=rng.uniform(20, 160),
+                color='#27ae60', zorder=5, alpha=0.9
+            )
+            ax.add_patch(leaf)
+            vein = patches.FancyArrowPatch(
+                (lx - 0.12, ly), (lx + 0.12, ly),
+                color='#1a7a40', linewidth=1, zorder=6
+            )
+            ax.add_patch(vein)
+
+    elif mbti == "ENFJ":
+        # 모짜렐라: 흰색 불규칙 얼룩들
+        for i in range(9):
+            angle = i * (2 * np.pi / 9)
+            r = rng.uniform(0.2, 0.65)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            moz = patches.Ellipse(
+                (x, y),
+                rng.uniform(0.18, 0.32),
+                rng.uniform(0.12, 0.22),
+                angle=rng.uniform(0, 180),
+                color='#FFFDE7', zorder=5, alpha=0.95,
+                ec='#F0E68C', linewidth=1
+            )
+            ax.add_patch(moz)
+
+    elif mbti == "ENFP":
+        # 콘: 노란 작은 알갱이들 (랜덤하게 산포)
+        for i in range(30):
+            angle = rng.uniform(0, 2 * np.pi)
+            r = rng.uniform(0.05, 0.78)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            corn = patches.Ellipse(
+                (x, y), 0.1, 0.07,
+                angle=rng.uniform(0, 180),
+                color='#FFD700', zorder=5,
+                ec='#FFA500', linewidth=0.8
+            )
+            ax.add_patch(corn)
+
+    elif mbti == "ISTJ":
+        # 양파: 보라색 링 조각들
+        for i in range(8):
+            angle = i * (2 * np.pi / 8)
+            r = rng.uniform(0.2, 0.65)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            onion = patches.Arc(
+                (x, y), 0.22, 0.14,
+                angle=np.degrees(angle),
+                theta1=0, theta2=270,
+                color='#9b59b6', linewidth=3, zorder=5
+            )
+            ax.add_patch(onion)
+
+    elif mbti == "ISFJ":
+        # 버섯: 갈색 우산 모양
+        mushroom_pos = [
+            (0.0, 0.5), (-0.45, 0.2), (0.45, 0.2),
+            (0.0, -0.45), (-0.3, -0.55), (0.35, -0.45)
+        ]
+        for (mx, my) in mushroom_pos:
+            cap = patches.Ellipse(
+                (mx, my + 0.05), 0.22, 0.13,
+                color='#8B4513', zorder=5
+            )
+            ax.add_patch(cap)
+            stem = plt.Polygon(
+                [[mx - 0.04, my], [mx + 0.04, my],
+                 [mx + 0.03, my - 0.1], [mx - 0.03, my - 0.1]],
+                color='#D2B48C', zorder=5
+            )
+            ax.add_patch(stem)
+
+    elif mbti == "ESTJ":
+        # 페퍼로니: 균일하게 배치된 빨간 원
+        positions_e = []
+        for ring, count, radius in [(1, 1, 0.0), (2, 5, 0.42), (3, 9, 0.70)]:
+            for i in range(count):
+                angle = i * (2 * np.pi / count) + (0.3 if ring == 3 else 0)
+                x = radius * np.cos(angle)
+                y = radius * np.sin(angle)
+                positions_e.append((x, y))
+        for (x, y) in positions_e:
+            pep = Circle((x, y), 0.12, color='#cc2200', zorder=5)
+            ax.add_patch(pep)
+            pep_inner = Circle((x, y), 0.06, color='#ff4422', zorder=6)
+            ax.add_patch(pep_inner)
+            pep_shine = Circle((x + 0.03, y + 0.03), 0.025,
+                               color='white', zorder=7, alpha=0.4)
+            ax.add_patch(pep_shine)
+
+    elif mbti == "ESFJ":
+        # 고구마 무스: 주황 물결 소용돌이
+        theta = np.linspace(0, 4 * np.pi, 300)
+        r_spiral = theta / (4 * np.pi) * 0.78
+        x_s = r_spiral * np.cos(theta)
+        y_s = r_spiral * np.sin(theta)
+        ax.plot(x_s, y_s, color='#FF8C00', linewidth=6, zorder=5, alpha=0.8)
+        ax.plot(x_s, y_s, color='#FFD580', linewidth=2, zorder=6, alpha=0.6)
+
+    elif mbti == "ISTP":
+        # 올리브: 검정/초록 링 모양
+        olive_pos = [
+            (0.1, 0.5), (-0.5, 0.1), (0.45, -0.2),
+            (-0.15, -0.5), (0.55, 0.35), (-0.4, -0.45)
+        ]
+        colors = ['#2C2C2C', '#3B7A3B', '#2C2C2C', '#3B7A3B', '#2C2C2C', '#3B7A3B']
+        for (ox, oy), col in zip(olive_pos, colors):
+            outer = Circle((ox, oy), 0.11, color=col, zorder=5)
+            ax.add_patch(outer)
+            inner = Circle((ox, oy), 0.05, color='#cc2200', zorder=6)
+            ax.add_patch(inner)
+
+    elif mbti == "ISFP":
+        # 선드라이 토마토: 진한 빨간 타원
+        for i in range(8):
+            angle = i * (2 * np.pi / 8) + 0.4
+            r = rng.uniform(0.2, 0.65)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            tmt = patches.Ellipse(
+                (x, y), 0.2, 0.13,
+                angle=rng.uniform(0, 180),
+                color='#8B0000', zorder=5, alpha=0.9
+            )
+            ax.add_patch(tmt)
+            tmt2 = patches.Ellipse(
+                (x, y), 0.1, 0.06,
+                angle=rng.uniform(0, 180),
+                color='#cc3300', zorder=6, alpha=0.7
+            )
+            ax.add_patch(tmt2)
+
+    elif mbti == "ESTP":
+        # 베이컨: 구불구불한 줄무늬
+        for i in range(5):
+            y_base = -0.6 + i * 0.28
+            x_wave = np.linspace(-0.75, 0.75, 100)
+            y_wave = y_base + 0.07 * np.sin(x_wave * 8 + i)
+            # 갈색 굵은 선
+            ax.plot(x_wave, y_wave, color='#8B3A3A',
+                    linewidth=7, zorder=5, alpha=0.85,
+                    solid_capstyle='round')
+            # 연한 줄
+            ax.plot(x_wave, y_wave + 0.015, color='#CD853F',
+                    linewidth=3, zorder=6, alpha=0.6,
+                    solid_capstyle='round')
+
+    elif mbti == "ESFP":
+        # 케첩: 지그재그 드리즐 패턴
+        x_drizzle = np.linspace(-0.75, 0.75, 200)
+        for offset in [-0.3, 0.0, 0.3]:
+            y_drizzle = offset + 0.18 * np.sin(x_drizzle * 10)
+            ax.plot(x_drizzle, y_drizzle, color='#cc0000',
+                    linewidth=3, zorder=5, alpha=0.85,
+                    solid_capstyle='round')
+        # 작은 케첩 방울들
+        for i in range(6):
+            angle = rng.uniform(0, 2 * np.pi)
+            r = rng.uniform(0.1, 0.6)
+            x, y = r * np.cos(angle), r * np.sin(angle)
+            drop = Circle((x, y), 0.05, color='#ee0000', zorder=6, alpha=0.8)
+            ax.add_patch(drop)
+
+    # ── 공통: 크러스트 테두리 강조 ──
+    crust_ring = Circle((0, 0), 1.1, fill=False,
+                         ec='#a0611a', linewidth=4, zorder=7)
+    ax.add_patch(crust_ring)
+
+    # ── MBTI 텍스트 ──
+    ax.text(0, -1.22, mbti, fontsize=15, ha='center', va='center',
+            color='#c0392b', fontweight='bold',
+            bbox=dict(boxstyle='round,pad=0.3', facecolor='#fff9f5',
+                      edgecolor='#ff6b35', linewidth=2))
+
+    plt.tight_layout()
+    return fig
+
 
 # ─────────────────────────────────────────────
 # 데이터: MBTI → 피자 토핑 정보
@@ -485,12 +732,14 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('<p class="selectbox-label">👇 당신의 MBTI를 선택하세요</p>', unsafe_allow_html=True)
+st.markdown('<p class="selectbox-label">👇 당신의 MBTI를 선택하세요</p>',
+            unsafe_allow_html=True)
 selected = st.selectbox("", ["-- 선택 --"] + MBTI_LIST, label_visibility="collapsed")
 
 if selected != "-- 선택 --":
     data = PIZZA_DATA[selected]
 
+    # ── 결과 카드 ──
     st.markdown(f"""
     <div class="result-card">
         <span class="topping-emoji">{data['emoji']}</span>
@@ -500,6 +749,17 @@ if selected != "-- 선택 --":
     </div>
     """, unsafe_allow_html=True)
 
+    # ── 🍕 피자 그림 ──
+    st.markdown("""
+    <p style="font-family:'Black Han Sans',sans-serif; font-size:1.1rem;
+              color:#c0392b; margin:20px 0 5px 0;">🎨 당신의 피자</p>
+    """, unsafe_allow_html=True)
+
+    fig = draw_pizza(selected)
+    st.pyplot(fig)
+    plt.close(fig)
+
+    # ── 분석 박스 ──
     st.markdown(f"""
     <div class="analysis-box">
         <p class="label">🔍 심층 분석 (매우 과학적)</p>
@@ -507,14 +767,16 @@ if selected != "-- 선택 --":
     </div>
     """, unsafe_allow_html=True)
 
+    # ── 판결문 ──
     st.markdown(f"""
     <div class="verdict-box">
         {data['verdict']}
     </div>
     """, unsafe_allow_html=True)
 
+    # ── 궁합 ──
     st.markdown("""
-    <p style="font-family:'Black Han Sans',sans-serif; font-size:1.1rem; 
+    <p style="font-family:'Black Han Sans',sans-serif; font-size:1.1rem;
               color:#c0392b; margin:20px 0 10px 0;">🍕 토핑 궁합</p>
     """, unsafe_allow_html=True)
 
@@ -538,6 +800,7 @@ if selected != "-- 선택 --":
 
     st.divider()
 
+    # ── 전체 토핑 지도 ──
     with st.expander("🍕 전체 토핑 지도 보기"):
         cols = st.columns(4)
         for i, (mbti, info) in enumerate(PIZZA_DATA.items()):
@@ -546,7 +809,7 @@ if selected != "-- 선택 --":
                 st.markdown(f"""
                 <div style="background:{'#fff3e0' if mbti == selected else '#f9f9f9'};
                             border:2px solid {'#ff6b35' if mbti == selected else '#eee'};
-                            border-radius:10px; padding:10px; text-align:center; 
+                            border-radius:10px; padding:10px; text-align:center;
                             margin-bottom:10px;">
                     <div style="font-size:1.8rem;">{info['emoji']}</div>
                     <div style="font-weight:700; color:#c0392b;">{is_me}{mbti}</div>
@@ -554,6 +817,7 @@ if selected != "-- 선택 --":
                 </div>
                 """, unsafe_allow_html=True)
 
+# ── 푸터 ──
 st.markdown("""
 <div class="footer">
     🍕 이 분석은 100% 비과학적입니다. 그래도 맞는 것 같죠? | Made with Streamlit
